@@ -103,5 +103,61 @@ ZMK v0.3 固定・physical-layout 定義済み。Studio からキーマップを
 
 ---
 
+## 7. 右手PCB×2枚構成への対応（2026-05-28）
+
+はんだ付けミスにより左手PCBが損傷し、右手PCB2枚のみが残った状態から分割キーボードとして再構成した記録。
+
+### ハードウェア構成
+| 部位 | PCB | ファームウェア |
+|:---:|:---:|:---:|
+| 左手（Central） | 右手PCB | `k_grid18_left.uf2` |
+| 右手（Peripheral） | 右手PCB | `k_grid18_right.uf2` |
+
+### 問題と対処
+
+#### ① アルファベット全列が鏡像になる
+右手PCBは左手PCBとGPIOの列配線が逆順のため、そのままでは全キーが反転。
+
+**対処：** `k_grid18_left.overlay` の `col-gpios` 順を右手と同じ順番に変更。
+
+```diff
+- = <&xiao_d 4 GPIO_ACTIVE_HIGH>   // 旧：外側(小指)→内側(人差し指)
+- , <&xiao_d 5 GPIO_ACTIVE_HIGH>
+- , <&xiao_d 10 GPIO_ACTIVE_HIGH>
+- , <&xiao_d 9 GPIO_ACTIVE_HIGH>
+- , <&xiao_d 8 GPIO_ACTIVE_HIGH>
++ = <&xiao_d 8 GPIO_ACTIVE_HIGH>   // 新：右手PCB物理配線と同一順
++ , <&xiao_d 9 GPIO_ACTIVE_HIGH>
++ , <&xiao_d 10 GPIO_ACTIVE_HIGH>
++ , <&xiao_d 5 GPIO_ACTIVE_HIGH>
++ , <&xiao_d 4 GPIO_ACTIVE_HIGH>
+```
+
+#### ② 親指キーの Command・Option が無反応
+右手PCBのrow 3スイッチ穴は **D8・D9・D10**（内側3列）にあるが、
+元のマトリクス定義は `RC(3,2)RC(3,3)RC(3,4)` = **D10・D5・D4** を期待しており、
+D5・D4にスイッチ穴がないため2キーが無反応になっていた。
+
+**対処：** マトリクス・キーマップ・レイアウトを一括修正。
+
+| ファイル | 変更内容 |
+|---|---|
+| `k_grid18.dtsi`（transform） | `RC(3,2,3,4)` → `RC(3,0,1,2)` |
+| `k_grid18.dtsi`（physical layout） | 親指左 x=200,300,400 → 0,100,200 |
+| `k_grid18.keymap` | 親指左の順序を `LGUI / RALT / SHIFT` に変更（全レイヤー） |
+| `k_grid18.keymap` | kanaEコンボ位置を `<32 31>` → `<30 31>` に更新 |
+| `k_grid18.json` | 親指左 col=2,3,4 → 0,1,2 |
+
+### 完成後の親指キー配列（左手、外側→内側）
+```
+LGUI(Command)  →  RALT(Option)  →  SHIFT
+```
+
+### 注意事項
+- キーマップ変更時は **左側だけ** `k_grid18_left.uf2` を書き込めばよい（右側は不要）
+- 接続リセットが必要な場合は「セクション6・リセット儀式」を参照
+
+---
+
 ## MIT License
 This project is licensed under the MIT License.
