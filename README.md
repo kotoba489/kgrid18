@@ -2,14 +2,14 @@
 # ⌨️ kgrid18
 ## 🛠️ Current Configuration 
 18キー（左右各9キー、最下段中央3キー×2）分割レイアウト。  
-kgrid20をベースに左右各2キー（row3の両端）を削除した19ピッチコンパクト版。
+kgrid20をベースに左右各2キーを削除した19ピッチコンパクト版。
 
 ## 📂 Branch Strategy
 - **main**: 安定版
 
 ## ✨ Special Features
 - **Split Layout**: `k_grid.json` の `"split": true` 設定と座標調整により、中央に1列分のスペースを配置。
-- **18キー構成**: row3（最下段）から左端 `RC(3,0)(3,1)` と右端 `RC(3,8)(3,9)` を削除。マトリクス配線（4行×5列）はkgrid20から変更なし。
+
 
 ## 🔨 Hardware Mod
 - **Keycaps**: 19ピッチ対応キーキャップ
